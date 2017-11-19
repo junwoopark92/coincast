@@ -26,6 +26,8 @@ source activate crawler
 cron으로 api crawler등록
 
 ```
-crontab -e
+$crontab -e
 * * * * * python crontest.py >> cron.log
+
+$service cron reload
 ```
