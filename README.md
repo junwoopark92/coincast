@@ -23,3 +23,9 @@ docker container에서 가상환경 생성
 conda create --name crawler python=3.5 anaconda
 source activate crawler
 ```
+cron으로 api crawler등록
+
+```
+crontab -e
+* * * * * python crontest.py >> cron.log
+```
