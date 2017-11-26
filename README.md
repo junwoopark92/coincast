@@ -31,7 +31,8 @@ $crontab -e
 
 $service cron reload
 ```
-- shell script사용하여 환경변수를 잡아야
+- shell script사용하여 환경변수를 잡아야함
+
 서버 시간 설정
 ```
 tzselect
