@@ -8,6 +8,8 @@ https://hub.docker.com/r/mysql/mysql-server/
 docker run --name my-container-name -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql/mysql-server:tag
 docker exec -it my-container-name mysql -uroot -p
 ```
+권한설정
+https://stackoverflow.com/questions/17425523/python-mysql-operationalerror-1045-access-denied-for-user-rootlocalhost
 
 ## batch server
 ubuntu + anaconda
