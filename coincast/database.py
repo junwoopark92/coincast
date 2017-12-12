@@ -39,7 +39,7 @@ if __name__ == '__main__':
     from coincast.model.coinone_tick import CoinoneTick
     from coincast.api import coinone_api
 
-    db_url = 'mysql://dev:qkrwnsdn92!@localhost/testdb?charset=utf8'
+    db_url = 'mysql://dev:coincast@localhost/testdb?charset=utf8'
     DBManager.init(db_url)
     DBManager.init_db()
 
