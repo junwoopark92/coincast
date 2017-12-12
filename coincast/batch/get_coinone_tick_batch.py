@@ -3,7 +3,7 @@ from coincast import database
 from coincast.model.coinone_tick import CoinoneTick
 from coincast.api import coinone_api
 
-db_url = 'mysql://dev:qkrwnsdn92!@localhost/testdb?charset=utf8'
+db_url = 'mysql://dev:password@localhost/testdb?charset=utf8'
 database.DBManager.init(db_url)
 database.DBManager.init_db()
 
