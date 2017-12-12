@@ -40,4 +40,7 @@ $service cron reload
 tzselect
 export TZ='Asia/Seoul'
 ```
-
+python3 mysql client 설치
+```
+pip install mysqlclient
+```
