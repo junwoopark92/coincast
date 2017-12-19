@@ -3,6 +3,9 @@ from . import Base
 
 from time import localtime, strftime
 
+ERROR = -1
+
+
 def api2orm_list(api_result_dict):
     error_code = api_result_dict['errorCode']
     api_result_dict.pop('errorCode')
@@ -39,6 +42,22 @@ def api2orm(api_result_dict):
                        yesterday_last=api_result_dict['yesterday_last'],
                        yesterday_high=api_result_dict['yesterday_high'],
                        yesterday_low=api_result_dict['yesterday_low'])
+
+
+def default_orm():
+    return CoinoneTick(currency="default",
+                       timestamp=ERROR,
+                       volume=ERROR,
+                       yesterday_volume=ERROR,
+                       first=ERROR,
+                       last=ERROR,
+                       high=ERROR,
+                       low=ERROR,
+                       yesterday_first=ERROR,
+                       yesterday_last=ERROR,
+                       yesterday_high=ERROR,
+                       yesterday_low=ERROR)
+
 
 class CoinoneTick(Base):
 
