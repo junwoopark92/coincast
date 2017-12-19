@@ -21,7 +21,7 @@ class DBManager:
 
         global dao
         dao = DBManager.__session
-        print(type(dao))
+        #print(type(dao))
 
     @staticmethod
     def init_db():
