@@ -35,8 +35,6 @@ def main():
         logger.info('coinone api return error')
         ticks_list = []
 
-    #ticks_list.insert(0, coinone_api.coinone_tick.default_orm())
-
     dao.add_all(ticks_list)
     dao.commit()
 

@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 dao = None
 
+
 class DBManager:
     """데이터베이스 처리를 담당하는 공통 클래스"""
 
@@ -30,10 +31,6 @@ class DBManager:
         Base.query = dao.query_property()
 
 
-
-
-
-import time
 if __name__ == '__main__':
 
     from coincast.model.coinone_tick import CoinoneTick

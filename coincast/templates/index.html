@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>COINCAST| {% block title %}{% endblock %}</title>
+
+    <link rel="SHORTCUT ICON" href="{{ url_for('static',filename='favicon.ico') }}" />
+
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- <link href="font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='font-awesome/css/font-awesome.min.css') }}">
+    <!--<link href="css/animate.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/animate.css') }}">
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static',filename='js/jquery-3.1.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
+
+    <script src="{{ url_for('static',filename='js/inspinia.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/plugins/pace/pace.min.js') }}"></script>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+<div id="wrapper">
+
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">JUNWOOPARK</strong>
+                             </span> <span class="text-muted text-xs block"> CREATOR <b class="caret"></b></span> </span> </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                                <li><a href="#">HI</a></li>
+                            </ul>
+                    </div>
+                    <div class="logo-element">
+                        IN+
+                    </div>
+                </li>
+                <li class="active">
+                     <a href="{{ url_for('coincast.index') }}"><i class="fa fa-th-large"></i> <span class="nav-label">HOME</span></a>
+                </li>
+                <li class="active">
+                     <a href="{{ url_for('coincast.index') }}"><i class="fa fa-th-large"></i> <span class="nav-label">FORECASTERS</span></a>
+                </li>
+                <li>
+                     <a href="{{ url_for('coincast.temp') }}"><i class="fa fa-th-large"></i> <span class="nav-label">TRADERS</span></a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+
+    <div id="page-wrapper" class="gray-bg">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+                    <form role="search" class="navbar-form-custom" method="post" action="#">
+                        <div class="form-group">
+                            <input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">
+                        </div>
+                    </form>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-sign-out"></i> Log out
+                        </a>
+                    </li>
+                </ul>
+
+            </nav>
+        </div>
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center m-t-lg">
+                        <h1>
+                            Welcome in CoinCast
+                        </h1>
+                        <small>
+                            프로토타입 제작중입니다. ^^
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+
+    		{% block content %}{% endblock %}
+
+	    </div>
+        <div class="footer">
+            <div class="pull-right">
+
+            </div>
+            <div>
+                <strong>Copyright</strong> CoinCast &copy; 2017-2018
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+
+</html>
