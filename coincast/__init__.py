@@ -1,6 +1,9 @@
 import os
+import eventlet
 from flask import Flask, render_template, request, url_for
 
+socketio = None
+thread_manager = None
 
 def print_setting(config):
     print('='*50)
@@ -32,6 +35,10 @@ def create_app(config_file_path='resource/config.cfg'):
     from coincast.coincast_config import CoincastConfig
     coincast_app.config.from_object(CoincastConfig)
     coincast_app.config.from_pyfile(config_file_path, silent=True)
+
+    from flask_socketio import SocketIO, send
+    global socketio
+    socketio = SocketIO(coincast_app,async_mode='eventlet')
     print_setting(coincast_app.config.items())
 
     # LOG INIT
@@ -40,10 +47,16 @@ def create_app(config_file_path='resource/config.cfg'):
                                 coincast_app.config['LOG_FILE_PATH'])
     Log.init(log_filepath=log_filepath)
 
+    # DB INIT
     from coincast.database import DBManager
     db_url=coincast_app.config['DB_URL']
     DBManager.init(db_url, eval(coincast_app.config['DB_LOG_FLAG']))
     DBManager.init_db()
+
+    # THREAD INIT
+    from coincast.thread import ThreadManager
+    global thread_manager
+    thread_manager = ThreadManager()
 
     from coincast.controller import index
 
@@ -56,4 +69,4 @@ def create_app(config_file_path='resource/config.cfg'):
     coincast_app.jinja_env.globals['url_for_other_page'] = \
         url_for_other_page
 
-    return coincast_app
+    return coincast_app, socketio

@@ -27,6 +27,9 @@
     <script src="{{ url_for('static',filename='js/inspinia.js') }}"></script>
     <script src="{{ url_for('static',filename='js/plugins/pace/pace.min.js') }}"></script>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
     {% block head %}{% endblock %}
 </head>
 
@@ -115,7 +118,7 @@
 
     </div>
 </div>
-
+{% block js %}{% endblock %}
 </body>
 
 </html>

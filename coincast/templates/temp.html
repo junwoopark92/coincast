@@ -5,5 +5,42 @@
 {% endblock %}
 
 {% block content %}
-    <div>TEMP VIEW</div>
+
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">per 15 sec</span>
+                <h5 id="currency">Loading</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" id="last">Loading</h1>
+                <div class="stat-percent font-bold text-success" id="rise-fall-rate" >Loading<i class="fa fa-level-up"></i></div>
+                <small id="update-dt">Loading</small>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var socket = io.connect('http://127.0.0.1:5000'+'/tick');
+
+            socket.on('connect', function() {
+               console.log('socket connected')
+            });
+
+            socket.on('message', function(msg) {
+
+                $("#currency").replaceWith('<h5>'+msg.currency+'</h5>')
+                $("#last").replaceWith('<h1 id="last">'+msg.last+'</h1>')
+                $("#update-dt").replaceWith('<small id="update-dt">'+msg.create_dt+'</small>')
+                $("#rise-fall-rate").replaceWith('<div class="stat-percent font-bold text-success" id="rise-fall-rate" >'+msg.rise_fall_rate+'%'+'<i class="fa fa-level-up"></i></div>')
+                console.log('Received message');
+            });
+        });
+    </script>
+{% endblock %}
+
+
+<!--$("#messages").append('<li>'+msg+'</li>');-->

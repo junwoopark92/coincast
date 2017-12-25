@@ -14,7 +14,7 @@ class DBManager:
 
     @staticmethod
     def init(db_url, db_log_flag=False):
-        DBManager.__engine = create_engine(db_url, echo=db_log_flag, pool_recycle=False)
+        DBManager.__engine = create_engine(db_url, pool_size=5, pool_recycle=5, echo=True, echo_pool=True)
         DBManager.__session = \
             scoped_session(sessionmaker(autocommit=False,
                                         autoflush=False,
@@ -22,7 +22,6 @@ class DBManager:
 
         global dao
         dao = DBManager.__session
-        #print(type(dao))
 
     @staticmethod
     def init_db():
