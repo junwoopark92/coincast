@@ -11,3 +11,5 @@ def get_logger(name):
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         console.setFormatter(formatter)
     return logger
+
+

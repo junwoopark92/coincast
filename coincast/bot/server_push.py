@@ -30,3 +30,17 @@ def update_last_tick(currency='btc'):
     socketio.emit('message', tick_dict, broadcast=True, namespace='/tick')
     eventlet.sleep(0)
     dao.remove()
+
+
+from coincast.bot.rsi_trader import rsi_trader_v01
+
+
+def rsi_trader_alarm():
+    trader = rsi_trader_v01(dao, 1000, 14, '%Y-%m-%d %H')
+    Log.info('rsi trader called: '+str(trader.create_dt.tm_sec))
+    return_buy = trader.buy()
+    return_sell = trader.sell()
+    if return_buy is not None:
+        Log.info('buy order alarm: '+str(return_buy))
+    if return_sell is not None:
+        Log.info('sell order alarm: ' + str(return_sell))

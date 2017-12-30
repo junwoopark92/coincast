@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "layout.html" %}
 {% block title %}TRADER LIST{% endblock %}
 {% block head %}
   {{ super() }}
@@ -6,25 +6,103 @@
 
 {% block content %}
 
-    <div class="col-lg-3">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <span class="label label-success pull-right">per 15 sec</span>
-                <h5 id="currency">Loading</h5>
+
+    <div class="row">
+        <div class="col-lg-6" id="foo">
+            <div class="ibox float-e-margins" id="dummy1">
+                <div class="ibox-title">
+                    <h5>BOT NAME</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-hover no-margins">
+                        <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Volumn</th>
+                            <th>Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><small>SELL</small></td>
+                            <td><i class="fa fa-clock-o"></i> 11:20pm</td>
+                            <td>100</td>
+                            <td>1300</td>
+                        </tr>
+                        <tr>
+                            <td><span class="label label-warning">Canceled</span> </td>
+                            <td><i class="fa fa-clock-o"></i> 10:40am</td>
+                            <td>Monica</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 66% </td>
+                        </tr>
+                        <tr>
+                            <td><small>Pending...</small> </td>
+                            <td><i class="fa fa-clock-o"></i> 01:30pm</td>
+                            <td>John</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 54% </td>
+                        </tr>
+                        <tr>
+                            <td><small>Pending...</small> </td>
+                            <td><i class="fa fa-clock-o"></i> 02:20pm</td>
+                            <td>Agnes</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 12% </td>
+                        </tr>
+                        <tr>
+                            <td><small>Pending...</small> </td>
+                            <td><i class="fa fa-clock-o"></i> 09:40pm</td>
+                            <td>Janet</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 22% </td>
+                        </tr>
+                        <tr>
+                            <td><span class="label label-primary">Completed</span> </td>
+                            <td><i class="fa fa-clock-o"></i> 04:10am</td>
+                            <td>Amelia</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 66% </td>
+                        </tr>
+                        <tr>
+                            <td><small>Pending...</small> </td>
+                            <td><i class="fa fa-clock-o"></i> 12:08am</td>
+                            <td>Damian</td>
+                            <td class="text-navy"> <i class="fa fa-level-up"></i> 23% </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="ibox-content">
-                <h1 class="no-margins" id="last">Loading</h1>
-                <div class="stat-percent font-bold text-success" id="rise-fall-rate" >Loading<i class="fa fa-level-up"></i></div>
-                <small id="update-dt">Loading</small>
+        </div>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div style="text-align:center">
+                    <button id="button1" class="btn btn-w-m btn-default" onclick="add_bot();">Default</button>
+                </div>
             </div>
         </div>
     </div>
 
+
+
 {% endblock %}
 {% block js %}
     <script type="text/javascript">
+        function add_bot() {
+            var basic = $('.dummy1').clone(true);
+            $('#foo').append(basic.removeClass('dummy1').show());
+        });
+    </script>
+
+
+    <script type="text/javascript">
         $(document).ready(function() {
-            var socket = io.connect('http://127.0.0.1:5000'+'/tick');
+            var socket = io.connect('http://127.0.0.1:5000'+'/trader');
 
             socket.on('connect', function() {
                console.log('socket connected')

@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+{% block title %}TRADER LIST{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="wrapper wrapper-content">
+        <div class="wrapper wrapper-content" id="foo">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div style="text-align:center">
+                            <button id="button1" class="btn btn-w-m btn-default"
+                                    onclick="window.location.href='{{ url_for('.show_create_trader_page') }}';">CREATE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for trader in trader_list %}
+    <div class="row">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ trader[1].name }}</h5>
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-xs btn-white active">Today</button>
+                                <button type="button" class="btn btn-xs btn-white">Monthly</button>
+                                <button type="button" class="btn btn-xs btn-white">Annual</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                        <div class="col-lg-9">
+                            <div class="flot-chart">
+                                <div class="flot-chart-content" id="{{ trader[0].run_no }}"  data-value="{{ trader[0].currency }}"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <ul class="stat-list">
+                                <li>
+                                    <h2 class="no-margins">{{ trader[0].cur_balance }}</h2>
+                                    <small>current balance</small>
+                                    <div class="stat-percent">{{ trader[0].revenue_rate }}<i class="fa fa-level-up text-navy"></i></div>
+                                </li>
+                                <li>
+                                    <h2 class="no-margins ">{{ trader[0].num_of_order }}</h2>
+                                    <small>Orders during running</small>
+                                </li>
+                                <li>
+                                    {% if trader[0].start_dt == None %}
+                                    <small class="no-margins ">{{ 'ready' }} ~ </small>
+                                    {% else %}
+                                    <small class="no-margins ">{{ trader[0].start_dt }} ~</small>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <button type="button" class="btn btn-w-m btn-primary" data-value="{{ trader[0].run_no }}">RUN</button>
+                                    {% if trader[0].start_dt == None %}
+                                    {% else %}
+                                    <button type="button" class="btn btn-w-m btn-danger" data-value="{{ trader[0].run_no }}">STOP</button>
+                                    {% endif %}
+
+                                </li>
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(document).ready(function() {
+
+        function gd(list) {
+            return [ new Date(list[0][0], list[0][1], list[0][2], list[0][3]).getTime(), list[1]] ;
+        }
+
+
+        $('.flot-chart-content').each(function(){
+            var data = {}
+            var id = $(this).attr('id')
+            data['run_no'] = id
+            data['currency'] = $(this).data('value')
+            data = JSON.stringify(data)
+
+            $.ajax({
+                context: this
+                ,url         : '/traders/seq'
+                ,type        : 'POST'
+                ,cache       : false
+                ,data        : data
+                ,contentType : 'application/json; charset=utf-8'
+                ,dataType    : 'json'
+                ,success: function(response) {
+                    console.log(response)
+                    var max = response['max']
+                    var min = response['min']
+                    var ticks = response['ticks']
+                    var data = ticks.map(gd)
+
+                    var dataset = [
+                        {
+                            label: response['currency'] +' price',
+                            data: data,
+                            color: "#1ab394",
+                            lines: {
+                                lineWidth:1,
+                                show: true,
+                                fill: true,
+                                fillColor: {
+                                colors: [{
+                                    opacity: 0.2
+                                    }, {
+                                    opacity: 0.4
+                                    }]
+                                }
+                        }
+
+                    }];
+                    var epochT = data[0][0]
+                    console.log(ticks[0][0])
+                    console.log(epochT)
+                    var options = {
+                        xaxis: {
+                            mode: "time",
+                            tickSize: [2, "hour"],
+                            min: epochT,
+                            max: epochT + 86400000, // time right now - 24 hours ago in milliseonds
+                            timezone: "browser"
+
+                        },
+                        yaxes: [
+                            {
+                                position: "right",
+                                max: max,
+                                min: min,
+                                color: "#d5d5d5",
+                                axisLabelUseCanvas: true,
+                                axisLabelFontSizePixels: 12,
+                                axisLabelFontFamily: 'Arial',
+                                axisLabelPadding: 3
+                            }
+                        ],
+                        legend: {
+                            noColumns: 1,
+                            labelBoxBorderColor: "#000000",
+                            position: "nw"
+                        },
+                        grid: {
+                            hoverable: false,
+                            borderWidth: 0
+                        }
+                    };
+
+                    $.plot(this, dataset, options );
+
+                }
+                ,error: function(error) {
+                    console.log(error);
+                    alert(error);
+                }
+            });
+
+        });
+
+     });
+
+
+    </script>
+    <script>
+        $(".btn-primary").click(function(){
+            var id = $(this).data('value')
+            var data = {}
+            data['run_no'] = id
+            data = JSON.stringify(data)
+            alert(id)
+            $.ajax({
+                url         : '/traders/run'
+                ,type        : 'POST'
+                ,cache       : false
+                ,data        : data
+                ,contentType : 'application/json; charset=utf-8'
+                ,dataType    : 'json'
+                ,success: function(response) {
+                    console.log(response)
+                }
+                ,error: function(error) {
+                    console.log(error);
+                    alert(error);
+                }
+            });
+        });
+
+        $(".btn-danger").click(function(){
+            var id = $(this).data('value')
+            var data = {}
+            data['run_no'] = id
+            data = JSON.stringify(data)
+            alert(id)
+            $.ajax({
+                url         : '/traders/stop'
+                ,type        : 'POST'
+                ,cache       : false
+                ,data        : data
+                ,contentType : 'application/json; charset=utf-8'
+                ,dataType    : 'json'
+                ,success: function(response) {
+                    console.log(response)
+                }
+                ,error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
