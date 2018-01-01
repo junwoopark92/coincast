@@ -33,7 +33,7 @@ class Trader(Base):
 if __name__ == '__main__':
     from coincast.database import DBManager
 
-    db_url = 'mysql://DEV:coincast@49.142.50.199/CC_DEV?charset=utf8'
+    db_url = 'mysql://REAL:coincast@49.142.50.199/CC_REAL?charset=utf8'
     DBManager.init(db_url)
     DBManager.init_db()
 
@@ -41,13 +41,13 @@ if __name__ == '__main__':
     queries = dao.query(Trader)
     entries = [dict(trader_no=q.trader_no, type=q.type, name=q.name, parm=q.trader_parm) for q in queries]
 
-    trader = Trader(trader_no=2, _type='statics', name='Test-Trader-01', comment='test-version',
-                    trader_parm={"in_seq": 14, "time": "3600", "target-rate": 5, "lower-bound-rsi": 30}, use_yn='Y')
+    trader = Trader(trader_no=1, _type='statics', name='RSI-Trader-01', comment='test-version',
+                    trader_parm={"period": 14, "time_unit_min": 15, "target-rate": 5, "lower-bound-rsi": 20}, use_yn='Y')
 
     dao.add(trader)
     # Trader.query.filter_by(trader_no=1).delete()
     dao.commit()
-    #
+
     # queries = dao.query(Trader)
     # entries = [dict(trader_no=q.trader_no, type=q.type, name=q.name, trader_parm=q.trader_parm) for q in queries]
 

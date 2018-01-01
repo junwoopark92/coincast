@@ -58,16 +58,15 @@
                                     {% if trader[0].start_dt == None %}
                                     <small class="no-margins ">{{ 'ready' }} ~ </small>
                                     {% else %}
-                                    <small class="no-margins ">{{ trader[0].start_dt }} ~</small>
+                                    <small class="no-margins ">{{ trader[0].start_dt }} ~ </small>
                                     {% endif %}
                                 </li>
                                 <li>
-                                    <button type="button" class="btn btn-w-m btn-primary" data-value="{{ trader[0].run_no }}">RUN</button>
-                                    {% if trader[0].start_dt == None %}
-                                    {% else %}
+                                    {% if is_alive[trader[0].run_no] %}
                                     <button type="button" class="btn btn-w-m btn-danger" data-value="{{ trader[0].run_no }}">STOP</button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-w-m btn-primary" data-value="{{ trader[0].run_no }}">RUN</button>
                                     {% endif %}
-
                                 </li>
                             </ul>
                         </div>
@@ -188,9 +187,10 @@
             var data = {}
             data['run_no'] = id
             data = JSON.stringify(data)
-            alert(id)
+            //alert(id)
             $.ajax({
-                url         : '/traders/run'
+                context : this
+                ,url         : '/traders/run'
                 ,type        : 'POST'
                 ,cache       : false
                 ,data        : data
@@ -198,10 +198,11 @@
                 ,dataType    : 'json'
                 ,success: function(response) {
                     console.log(response)
+                    location.reload();
+
                 }
                 ,error: function(error) {
                     console.log(error);
-                    alert(error);
                 }
             });
         });
@@ -211,9 +212,10 @@
             var data = {}
             data['run_no'] = id
             data = JSON.stringify(data)
-            alert(id)
+            //alert(id)
             $.ajax({
-                url         : '/traders/stop'
+                context : this
+                ,url         : '/traders/stop'
                 ,type        : 'POST'
                 ,cache       : false
                 ,data        : data
@@ -221,6 +223,7 @@
                 ,dataType    : 'json'
                 ,success: function(response) {
                     console.log(response)
+                    location.reload();
                 }
                 ,error: function(error) {
                     console.log(error);

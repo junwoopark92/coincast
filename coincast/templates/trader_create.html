@@ -17,12 +17,17 @@
                             <form role="form" action="{{ url_for('coincast.create_trader') }}" method="post">
                                 <div class="form-group">
                                     <label>SELECT TRADER</label>
-                                    <select class="form-control m-b" name="trader">
+                                    <select class="form-control m-b" id="select_box" name="trader">
+                                         <option disabled selected value> -- select an option -- </option>
                                     {% for trader in trader_list %}
                                         <option>{{ trader[0] }}</option>
                                     {% endfor %}
                                     </select>
                                 </div>
+
+                                <div class="form-group" id="trader_list">
+                                </div>
+
                                 <div class="form-group">
                                     <label>SELECT CURRENCY</label>
                                     <select class="form-control m-b" name="currency">
@@ -31,8 +36,14 @@
                                     {% endfor %}
                                     </select>
                                 </div>
-                                <div class="form-group"><label>INTERVAL</label><input type="number" name="interval" class="form-control"></div>
-                                <div class="form-group"><label>BALANCE</label><input type="number" name="balance" class="form-control"></div>
+                                <div class="form-group">
+                                    <label>INTERVAL</label>
+                                    <input type="number" name="interval" class="form-control" value="10">
+                                </div>
+                                <div class="form-group">
+                                    <label>BALANCE</label>
+                                    <input type="number" name="balance" class="form-control" value="10000000">
+                                </div>
                                 <div>
                                     <button class="btn btn-sm btn-primary pull-right m-t-n-xs"
                                             type="submit">
@@ -50,4 +61,51 @@
 {% endblock %}
 
 {% block js %}
+<script>
+    $("#select_box").change(function(){
+        //alert($(this).val());
+        //alert($(this).children("option:selected").text());
+
+        $("#trader_list *").remove();
+
+        var trader = $(this).val()
+        var data = {}
+
+        data['trader'] = trader
+        alert(data['trader'])
+        data = JSON.stringify(data)
+        $.ajax({
+            url         : '/create/trader/parm'
+            ,type        : 'POST'
+            ,cache       : false
+            ,data        : data
+            ,contentType : 'application/json; charset=utf-8'
+            ,dataType    : 'json'
+            ,success: function(response) {
+                console.log(response)
+                var trader_parm = response['trader_parm'][0]
+                for(key in trader_parm){
+
+                    $("#trader_list").append(
+                        '<div class="form-group">'
+                        +'<label>'
+                        +key
+                        +'</label>'
+                        +'<input name='
+                        +key
+                        +' class="form-control"'
+                        +'value='
+                        +trader_parm[key]
+                        +'>'
+                        +'</div>')
+                }
+            }
+            ,error: function(error) {
+                console.log(error);
+                alert('트레이더 등록중 오류발생')
+            }
+        });
+
+    });
+</script>
 {% endblock %}

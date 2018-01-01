@@ -15,6 +15,13 @@ def listen(func, interval=10):
             time.sleep(interval)
 
 
+def enrollment_trader(func, func_parm, interval=10):
+    while True:
+        func(func_parm)
+        if interval != 0:
+            time.sleep(interval)
+
+
 def update_last_tick(currency='btc'):
     queries = dao.query(CoinoneTick)
     tick = queries.filter_by(currency=currency).order_by(CoinoneTick.timestamp.desc()).first()
@@ -35,12 +42,20 @@ def update_last_tick(currency='btc'):
 from coincast.bot.rsi_trader import rsi_trader_v01
 
 
-def rsi_trader_alarm():
-    trader = rsi_trader_v01(dao, 1000, 14, '%Y-%m-%d %H')
-    Log.info('rsi trader called: '+str(trader.create_dt.tm_sec))
-    return_buy = trader.buy()
-    return_sell = trader.sell()
+def rsi_trader_alarm(run_no):
+    from coincast.model.trader_run_hist import SimulTraderRunHist
+    run_info = dao.query(SimulTraderRunHist).filter(SimulTraderRunHist.run_no == run_no).first()
+
+    trader = rsi_trader_v01(dao, run_info)
+    return_buy, volume, rsi = trader.buy()
+    return_sell, revenue_rate = trader.sell()
+
+    Log.info('[trader %s called] current rsi: %s revenue_rate %s' % (run_info.run_no, rsi, revenue_rate))
+
     if return_buy is not None:
-        Log.info('buy order alarm: '+str(return_buy))
+        Log.info('[buy order alarm] run_no: %s buy_price: %s volume: %s rsi: %s' % (run_info.run_no, return_buy, volume, rsi))
     if return_sell is not None:
-        Log.info('sell order alarm: ' + str(return_sell))
+        Log.info('[sell order alarm] run_no: %s sell_price: %s revenue_rate: %s' %
+                 (run_info.run_no, return_buy, revenue_rate))
+
+    dao.remove()
