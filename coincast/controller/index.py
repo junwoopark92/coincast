@@ -7,6 +7,7 @@ from coincast.database import dao
 from coincast.model.coinone_tick import CoinoneTick
 from coincast.model.trader import Trader
 from coincast.model.trader_run_hist import SimulTraderRunHist
+from coincast.model.trader_order import SimulTraderOrder
 from coincast import thread_manager
 from coincast.coincast_logger import Log
 from coincast.validation import is_positive_number
@@ -51,6 +52,28 @@ def show_traders():
         is_alive[run_no] = True
 
     return render_template('traders.html', trader_list=trader_list, is_alive=is_alive)
+
+
+@coincast.route('/traders/order', methods=['post'])
+def show_trader_order_hist():
+    data = request.json
+    Log.info(data)
+
+    orders = dao.query(SimulTraderOrder)\
+        .filter(SimulTraderOrder.run_no == data['run_no'])\
+        .order_by(SimulTraderOrder.create_dt.desc())\
+        .all()
+
+    orders = [order.__dict__ for order in orders]
+
+    order_list = []
+    for order in orders:
+        order.pop('_sa_instance_state')
+        order.pop('update_dt')
+        order['create_dt'] = order['create_dt'].strftime('%Y/%m/%d %H:%M:%S')
+        order_list.append(order)
+
+    return json.dumps({'status': 'OK', 'order_list': order_list})
 
 
 @coincast.route('/create')

@@ -88,9 +88,10 @@ class rsi_trader_v01():
             self.bot_dao.add(order)
             balance = self.run_info.cur_balance - buy_price*volume
 
-            self.bot_dao.query(SimulTraderRunHist.cur_balance) \
+            self.bot_dao.query(SimulTraderRunHist) \
                 .filter(SimulTraderRunHist.run_no == self.run_info.run_no) \
-                .update({SimulTraderRunHist.cur_balance: balance})
+                .update({SimulTraderRunHist.cur_balance: balance,
+                         SimulTraderRunHist.num_of_order: SimulTraderRunHist.num_of_order + 1})
             self.bot_dao.commit()
 
             return buy_price, volume, rsi
@@ -117,9 +118,10 @@ class rsi_trader_v01():
 
             balance = self.run_info.cur_balance + sell_price*last_order.volume
 
-            self.bot_dao.query(SimulTraderRunHist.cur_balance) \
+            self.bot_dao.query(SimulTraderRunHist) \
                 .filter(SimulTraderRunHist.run_no == self.run_info.run_no) \
-                .update({SimulTraderRunHist.cur_balance: balance})
+                .update({SimulTraderRunHist.cur_balance: balance,
+                         SimulTraderRunHist.num_of_order: SimulTraderRunHist.num_of_order + 1})
 
             self.bot_dao.commit()
 
