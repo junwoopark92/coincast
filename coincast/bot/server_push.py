@@ -56,6 +56,6 @@ def rsi_trader_alarm(run_no):
         Log.info('[buy order alarm] run_no: %s buy_price: %s volume: %s rsi: %s' % (run_info.run_no, return_buy, volume, rsi))
     if return_sell is not None:
         Log.info('[sell order alarm] run_no: %s sell_price: %s revenue_rate: %s' %
-                 (run_info.run_no, return_buy, revenue_rate))
+                 (run_info.run_no, return_sell, revenue_rate))
 
     dao.remove()
