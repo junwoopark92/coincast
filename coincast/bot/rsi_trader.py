@@ -117,11 +117,11 @@ class rsi_trader_v01():
         revenue_rate = (sell_price - last_order.price)/last_order.price*100
 
         # update current balance
-        balance = self.run_info.cur_balance + sell_price * last_order.volume
+        estimated_balance = self.run_info.cur_balance + sell_price * last_order.volume
 
         self.bot_dao.query(SimulTraderRunHist) \
             .filter(SimulTraderRunHist.run_no == self.run_info.run_no) \
-            .update({SimulTraderRunHist.cur_balance: balance})
+            .update({SimulTraderRunHist.estimated_balance: estimated_balance})
 
         self.bot_dao.commit()
 
