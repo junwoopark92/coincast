@@ -122,7 +122,9 @@ class rsi_trader_v01():
         self.bot_dao.query(SimulTraderRunHist) \
             .filter(SimulTraderRunHist.run_no == self.run_info.run_no) \
             .update({SimulTraderRunHist.cur_balance: balance})
-        
+
+        self.bot_dao.commit()
+
         if revenue_rate > float(self.run_info.trader_parm['target-rate']):
             order = SimulTraderOrder(self.run_info.run_no, 'sell', sell_price, last_order.volume)
             self.bot_dao.add(order)
