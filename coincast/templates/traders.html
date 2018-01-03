@@ -27,17 +27,27 @@
             <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>{{ trader[1].name }}</h5>
-                        <div class="pull-right">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-xs btn-white active">Today</button>
-                                <button type="button" class="btn btn-xs btn-white">Monthly</button>
-                                <button type="button" class="btn btn-xs btn-white">Annual</button>
-                            </div>
+                        <div class="col-lg-3">
+                            <h5>{{ trader[1].name }}</h5>
+                        </div>
+                        <div class="col-lg-9">
+                            <span class="label label-warning log-info animated fadeInUp pull-right" data-value="{{ trader[0].run_no }}"></span>
                         </div>
                     </div>
-
                     <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-xs btn-white active">Today</button>
+                                        <button type="button" class="btn btn-xs btn-white">Monthly</button>
+                                        <button type="button" class="btn btn-xs btn-white">Annual</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                            </div>
+                        </div>
                         <div class="row">
                         <div class="col-lg-9">
                             <div class="flot-chart">
@@ -47,7 +57,7 @@
                         <div class="col-lg-3">
                             <ul class="stat-list">
                                 <li>
-                                    <h2 class="no-margins">{{ trader[0].cur_balance }}</h2>
+                                    <h2 class="no-margins">{{ trader[0].estimated_balance }}</h2>
                                     <small>current balance</small>
                                     <div class="stat-percent">{{ trader[0].revenue_rate }}<i class="fa fa-level-up text-navy"></i></div>
                                 </li>
@@ -111,6 +121,29 @@
 {% block js %}
     <script>
         $(document).ready(function() {
+            $('.log-info').each(function(){
+                var run_no = $(this).data('value')
+                var url = 'http://'+location.host+'/trader/log/'+run_no
+                var socket = io.connect(url);
+
+                var $this = $(this);
+                socket.on('connect', function() {
+                   console.log('socket connected')
+                });
+
+                socket.on('message', function(msg) {
+                    //console.log('Received message');
+                    $this.hide().html(msg).fadeIn(3000,function(){
+                     setTimeout(function(){$this.fadeOut(3000);},3000);
+                    });
+
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
             $('.order_list').each(function(){
                 var id = $(this).data('value')
                 var data = {}
@@ -126,7 +159,7 @@
                     ,contentType : 'application/json; charset=utf-8'
                     ,dataType    : 'json'
                     ,success: function(response) {
-                        console.log(response)
+                        //console.log(response)
 
                         var order_list = response['order_list']
                         for(order in order_list){
@@ -178,7 +211,7 @@
                 ,contentType : 'application/json; charset=utf-8'
                 ,dataType    : 'json'
                 ,success: function(response) {
-                    console.log(response)
+                    //console.log(response)
                     var max = response['max']
                     var min = response['min']
                     var ticks = response['ticks']
@@ -270,7 +303,10 @@
                 ,dataType    : 'json'
                 ,success: function(response) {
                     console.log(response)
-                    location.reload();
+
+                    var stop_btn = '<button type="button" class="btn btn-w-m btn-danger" data-value='
+                        +$(this).data('value')+'>STOP</button>'
+                    $(this).replaceWith(stop_btn)
 
                 }
                 ,error: function(error) {
@@ -295,7 +331,8 @@
                 ,dataType    : 'json'
                 ,success: function(response) {
                     console.log(response)
-                    location.reload();
+                    var run_btn = ''
+                    $(this).replaceWith(run_btn)
                 }
                 ,error: function(error) {
                     console.log(error);

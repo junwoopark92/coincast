@@ -15,6 +15,7 @@ class SimulTraderRunHist(Base):
     init_balance = Column(Integer)
 
     cur_balance = Column(Integer)
+    estimated_balance = Column(Integer)
     all_revenue_rate = Column(Float)
     num_of_order = Column(Integer)
 
@@ -31,6 +32,7 @@ class SimulTraderRunHist(Base):
         self.currency = currency
         self.cur_balance = init_balance
         self.init_balance = init_balance
+        self.estimated_balance = init_balance
         self.time_interval = time_interval
         self.trader_parm = trader_parm
 
