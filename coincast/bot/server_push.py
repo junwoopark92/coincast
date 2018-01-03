@@ -50,7 +50,7 @@ def rsi_trader_alarm(run_no):
     return_buy, volume, rsi = trader.buy()
     return_sell, revenue_rate = trader.sell()
 
-    log_info = '[TRADER %s Called] RSI: %s 수익률 %s' % (run_info.run_no, rsi, revenue_rate)
+    log_info = '[TRADER %s Called] RSI: %s 수익률: %s' % (run_info.run_no, rsi, revenue_rate)
     Log.info(log_info)
 
     if return_buy is not None:
