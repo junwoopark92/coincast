@@ -14,7 +14,7 @@ class DBManager:
 
     @staticmethod
     def init(db_url, db_log_flag=False):
-        DBManager.__engine = create_engine(db_url, pool_size=5, pool_recycle=5, echo=False, echo_pool=True)
+        DBManager.__engine = create_engine(db_url, pool_size=10, pool_recycle=30, echo=False, echo_pool=True)
         DBManager.__session = \
             scoped_session(sessionmaker(autocommit=False,
                                         autoflush=False,
