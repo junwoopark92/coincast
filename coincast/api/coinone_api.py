@@ -1,4 +1,4 @@
-import simplejson as json
+import simplejson
 import httplib2
 
 
@@ -13,7 +13,7 @@ def get_response(url):
 
 def get_result(url):
     content = get_response(url)
-    content = json.loads(content)
+    content = simplejson.loads(content)
     return content
 
 
