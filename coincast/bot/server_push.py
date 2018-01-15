@@ -3,6 +3,8 @@ from coincast import socketio
 from coincast.model.coinone_tick import CoinoneTick
 from coincast.coincast_logger import Log
 
+from coincast.model.trader_run_hist import SimulTraderRunHist
+
 import sys
 import eventlet
 import time
@@ -10,14 +12,23 @@ import time
 
 def listen(func, interval=10):
     while True:
-        func()
+        try:
+            func()
+        except:
+            Log.error('listen func ERROR')
         if interval != 0:
             time.sleep(interval)
 
 
 def enrollment_trader(func, func_parm, interval=10):
     while True:
-        func(func_parm)
+        try:
+            func(func_parm)
+        except:
+            Log.error('TRADER ERROR')
+            dst_namespace = '/trader/log/' + str(func_parm)
+            socketio.emit('message', 'ERROR', broadcast=True, namespace=dst_namespace)
+
         if interval != 0:
             time.sleep(interval)
 
@@ -43,22 +54,23 @@ from coincast.bot.rsi_trader import rsi_trader_v01
 
 
 def rsi_trader_alarm(run_no):
-    from coincast.model.trader_run_hist import SimulTraderRunHist
-    run_info = dao.query(SimulTraderRunHist).filter(SimulTraderRunHist.run_no == run_no).first()
 
+    run_info = dao.query(SimulTraderRunHist).filter(SimulTraderRunHist.run_no == run_no).first()
     trader = rsi_trader_v01(run_info)
 
     return_buy, volume, rsi = trader.buy()
     return_sell, revenue_rate = trader.sell()
 
-    log_info = '[TRADER %s Called] RSI: %s 수익률 %s' % (run_info.run_no, rsi, revenue_rate)
+    log_info = '[TRADER %s Called] RSI: %s 수익률: %s' % (run_info.run_no, rsi, revenue_rate)
     Log.info(log_info)
 
     if return_buy is not None:
-        Log.info('[buy order alarm] run_no: %s buy_price: %s volume: %s rsi: %s' % (run_info.run_no, return_buy, volume, rsi))
+        Log.info('[buy order alarm] run_no: %s buy_price: %s volume: %s rsi: %s' % (
+        run_info.run_no, return_buy, volume, rsi))
+
     if return_sell is not None:
         Log.info('[sell order alarm] run_no: %s sell_price: %s revenue_rate: %s' %
-                 (run_info.run_no, return_sell, revenue_rate))
+        (run_info.run_no, return_sell, revenue_rate))
 
     dst_namespace = '/trader/log/'+str(run_no)
     socketio.emit('message', log_info, broadcast=True, namespace=dst_namespace)
