@@ -3,7 +3,7 @@ from coincast.model.trader_order import SimulTraderOrder
 from coincast.model.trader_run_hist import SimulTraderRunHist
 from coincast.model.trader import Trader
 from datetime import datetime, timedelta
-
+from coincast.database import dao
 from coincast.coincast_logger import Log
 from sqlalchemy.sql import func
 import pandas as pd
@@ -29,15 +29,19 @@ def get_rsi(seq):
 
 class rsi_trader_v01():
     time_unit = 15
-    bot_dao = None
+    bot_dao = dao
     run_info = None
     trader_parm = None
 
-    def __init__(self, _dao, run_info):
+    def __init__(self, run_info):
         self.run_info = run_info
-        self.bot_dao = _dao
         self.trader_parm = run_info.trader_parm
         self.time_unit = int(self.trader_parm['time_unit_min'])
+
+    def __del__(self):
+        log_info = '[TRADER %s is DELETED]' % self.run_info.run_no
+        Log.info(log_info)
+        self.bot_dao.remove()
 
     def get_indexes(self, currency):
         current_price = self.bot_dao.query(CoinoneTick.last) \

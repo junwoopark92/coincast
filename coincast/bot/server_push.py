@@ -46,7 +46,8 @@ def rsi_trader_alarm(run_no):
     from coincast.model.trader_run_hist import SimulTraderRunHist
     run_info = dao.query(SimulTraderRunHist).filter(SimulTraderRunHist.run_no == run_no).first()
 
-    trader = rsi_trader_v01(dao, run_info)
+    trader = rsi_trader_v01(run_info)
+
     return_buy, volume, rsi = trader.buy()
     return_sell, revenue_rate = trader.sell()
 
@@ -61,5 +62,3 @@ def rsi_trader_alarm(run_no):
 
     dst_namespace = '/trader/log/'+str(run_no)
     socketio.emit('message', log_info, broadcast=True, namespace=dst_namespace)
-
-    dao.remove()
