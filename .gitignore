@@ -1,6 +1,6 @@
 .DS_Store
 .idea
-.cfg
+*.cfg
 
 __pycache__/
 *.py[cod]
@@ -55,6 +55,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+*.log.*
 .static_storage/
 .media/
 local_settings.py
@@ -73,7 +74,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-# .ipynb_checkpoints
+.ipynb_checkpoints
 
 # pyenv
 .python-version
