@@ -4,6 +4,7 @@ from coincast.model.coinone_tick import CoinoneTick
 from coincast.coincast_logger import Log
 
 from coincast.model.trader_run_hist import SimulTraderRunHist
+from coincast.model.trader_run_hist import RealTraderRunHist
 
 import sys
 import eventlet
@@ -50,8 +51,7 @@ def update_last_tick(currency='btc'):
     dao.remove()
 
 
-from coincast.bot.rsi_trader import rsi_trader_v01
-
+from coincast.bot.rsi_trader import rsi_trader_v01, real_rsi_trader_v01
 
 def rsi_trader_alarm(run_no):
 
@@ -74,3 +74,22 @@ def rsi_trader_alarm(run_no):
 
     dst_namespace = '/trader/log/'+str(run_no)
     socketio.emit('message', log_info, broadcast=True, namespace=dst_namespace)
+
+    dao.remove()
+
+def real_rsi_trader_alarm(run_no):
+    run_info = dao.query(RealTraderRunHist).filter(RealTraderRunHist.run_no == run_no).first()
+    trader = real_rsi_trader_v01(dao, run_info)
+    return_buy, volume, rsi = trader.buy()
+
+    log_info = '[TRADER %s Called] RSI: %s' % (run_info.run_no, rsi)
+    Log.info(log_info)
+
+    if return_buy is not None:
+        Log.info('[buy order alarm] run_no: %s buy_price: %s volume: %s rsi: %s' % (
+        run_info.run_no, return_buy, volume, rsi))
+
+    dst_namespace = '/trader/real/log/'+str(run_no)
+    socketio.emit('message', log_info, broadcast=True, namespace=dst_namespace)
+
+    dao.remove()

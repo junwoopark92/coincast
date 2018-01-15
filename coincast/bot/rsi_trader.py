@@ -1,9 +1,10 @@
 from coincast.model.coinone_tick import CoinoneTick
 from coincast.model.trader_order import SimulTraderOrder
 from coincast.model.trader_run_hist import SimulTraderRunHist
+from coincast.model.trader_run_hist import RealTraderRunHist
 from coincast.model.trader import Trader
 from datetime import datetime, timedelta
-from coincast.database import dao
+from coincast import exchange
 from coincast.coincast_logger import Log
 from sqlalchemy.sql import func
 import pandas as pd
@@ -143,6 +144,76 @@ class rsi_trader_v01():
 
         return None, round(revenue_rate, 2)
 
+
+class real_rsi_trader_v01():
+    time_unit = 15
+    bot_dao = None
+    run_info = None
+    trader_parm = None
+
+    def __init__(self, _dao, run_info):
+        self.run_info = run_info
+        self.bot_dao = _dao
+        self.trader_parm = run_info.trader_parm
+        self.time_unit = int(self.trader_parm['time_unit_min'])
+
+    def get_indexes(self, currency):
+        current_price = self.bot_dao.query(CoinoneTick.last) \
+            .filter(CoinoneTick.currency == currency) \
+            .order_by(CoinoneTick.create_dt.desc()) \
+            .first()[0]
+
+        yesterday = datetime.now() - timedelta(hours=24)
+
+        period = int(self.trader_parm['period'])
+
+        time = [i * self.time_unit for i in range(int(60 / self.time_unit))]
+
+        data = self.bot_dao.query(CoinoneTick.create_dt, CoinoneTick.last) \
+            .filter_by(currency=currency) \
+            .filter(func.date_format(CoinoneTick.create_dt, '%Y,%m,%d,%H') >= yesterday.strftime('%Y,%m,%d')) \
+            .filter(func.Minute(CoinoneTick.create_dt).in_(time)) \
+            .filter(func.Second(CoinoneTick.create_dt) < 5) \
+            .order_by(CoinoneTick.create_dt.desc()) \
+            .limit(period - 1) \
+            .all()
+
+        Log.debug(data)
+
+        if len(data) != period - 1:
+            print(len(data), period)
+            return None, current_price
+
+        seq = [float(last) for time, last in data]
+        seq.insert(0, current_price)
+
+        rsi = get_rsi(pd.Series(seq))
+
+        return rsi, current_price
+
+    def buy(self):
+        rsi, buy_price = self.get_indexes(currency=self.run_info.currency)
+        volume = int(self.run_info.cur_balance / buy_price)
+
+        if volume < 1:
+            return None, None, rsi
+
+        if rsi is None:
+            return None, None, rsi
+
+        if rsi < float(self.run_info.trader_parm['lower-bound-rsi']):
+            Log.info(exchange.buy_coin_order(coin_type='iota', price=buy_price, qty=volume))
+            balance = self.run_info.cur_balance - buy_price*volume
+
+            self.bot_dao.query(RealTraderRunHist) \
+                .filter(RealTraderRunHist.run_no == self.run_info.run_no) \
+                .update({RealTraderRunHist.cur_balance: balance,
+                         RealTraderRunHist.num_of_order: RealTraderRunHist.num_of_order + 1})
+            self.bot_dao.commit()
+
+            return buy_price, volume, rsi
+
+        return None, None, rsi
 
 if __name__ == '__main__':
     pass

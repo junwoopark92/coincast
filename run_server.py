@@ -4,7 +4,7 @@ from coincast import create_app
 application, socketio = create_app()
 
 from coincast.bot.server_push import listen, update_last_tick
-eventlet.spawn(listen, update_last_tick, 10)
+#eventlet.spawn(listen, update_last_tick, 10)
 
 # from coincast.bot.server_push import rsi_trader_alarm
 # eventlet.spawn(listen, rsi_trader_alarm, 5)

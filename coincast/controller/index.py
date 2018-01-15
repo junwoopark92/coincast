@@ -76,7 +76,7 @@ def show_trader_order_hist():
     return json.dumps({'status': 'OK', 'order_list': order_list})
 
 
-@coincast.route('/create')
+@coincast.route('/create/simul')
 def show_create_trader_page():
     # trader list 가져오기
     trader_list = dao.query(Trader.name).filter(Trader.use_yn == 'Y').all()

@@ -11,19 +11,15 @@ import hmac
 class CoinoneExchange(Excahnge):
     def __init__(self, access_token=None, secret_key=None, username=None):
         if access_token is None or secret_key is None or username is None:
-           #raise Exception("Need to access token or secret_key.")
-            print("init access token")
-            config = configparser.ConfigParser()
-            config.read('C:/Users/pjw92/PycharmProjects/coincast/coincast/resource/coinone.auth')
-            print(config.sections())
-            self.access_token = config['DEFAULT']["ACCESSTOKEN"]
-            self.secret_key = config['DEFAULT']['SECRETKEY']
+           raise Exception("Need to access token or secret_key.")
+
         else :
             self.access_token = access_token
             self.secret_key = secret_key
 
         self.host = "https://api.coinone.co.kr"
         self.username = username
+
 
     def get_username(self):
         return self.username
@@ -44,28 +40,7 @@ class CoinoneExchange(Excahnge):
 
         saved self.access_token, self.refresh_token, self.token_type
         """
-        token_api_path = "/oauth/refresh_token/"
-        url_path = self.host + token_api_path
-        "Maybe coinone token expire time is longer than korbit."
-        self.expire = 3600
-        if grant_type == "refresh_token":
-            headers = {"content-type": "application/x-www-form-urlencoded"}
-            data = {"access_token": self.access_token}
-            config = configparser.ConfigParser()
-            config.read('resource/coinone.auth')
-            res = requests.post(url_path, headers=headers, data=data)
-            result = res.json()
-            self.access_token = result["accessToken"]
-            config['DEFAULT']["ACCESSTOKEN"] = self.access_token
-            with open('resource/coinone.auth', 'w') as configfile:
-                config.write(configfile)
-        else:
-            config = configparser.ConfigParser()
-            config.read('C:/Users/pjw92/PycharmProjects/coincast/coincast/resource/coinone.auth')
-            print(config.sections())
-            self.access_token = config['DEFAULT']["ACCESSTOKEN"]
-        "coinone doesn't have refresh_token. you can get access_token if you return old token"
-        return self.expire, self.access_token, self.access_token
+        pass
 
     def get_ticker(self, coin_type=None):
         """
@@ -291,8 +266,8 @@ class CoinoneExchange(Excahnge):
 
 if __name__ == '__main__':
     exchange = CoinoneExchange(username='test')
-    print(exchange.set_token(grant_type='init'))
-    print(exchange.get_wallet_status())
+    #print(exchange.set_token(grant_type='init'))
+    #print(exchange.get_wallet_status())
     order_list = exchange.get_list_my_orders(coin_type='btc')
     #order = order_list['limitOrders'][0]
     #print(order_list)
