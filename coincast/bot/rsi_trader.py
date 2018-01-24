@@ -158,6 +158,11 @@ class real_rsi_trader_v01():
         self.trader_parm = run_info.trader_parm
         self.time_unit = int(self.trader_parm['time_unit_min'])
 
+    def __del__(self):
+        log_info = '[TRADER %s is DELETED]' % self.run_info.run_no
+        Log.info(log_info)
+        self.bot_dao.remove()
+
     def get_indexes(self, currency):
         current_price = self.bot_dao.query(CoinoneTick.last) \
             .filter(CoinoneTick.currency == currency) \
