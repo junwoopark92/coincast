@@ -29,12 +29,32 @@ class SimulTraderOrder(Base):
         self.create_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
         self.update_dt = self.create_dt
 
+class RealTraderOrder(Base):
+    __tablename__ = 'real_trader_order_hist'
 
-# class RealTraderOrder(Base):
-#     __tablename__ = 'real_trader_order_hist'
-#     pass
+    order_id = Column(String(100), primary_key=True)
+    run_no = Column(Integer)
+    type = Column(String(10))
 
+    price = Column(Integer)
+    volume = Column(Integer)
 
+    order_status = Column(String(20))
+    success_yn = Column(String(10))
+
+    create_dt = Column(DateTime, unique=False)
+    update_dt = Column(DateTime, unique=False)
+
+    def __init__(self, order_id ,run_no, _type, price, volume, order_status):
+        self.order_id = order_id
+        self.run_no = run_no
+        self.type = _type
+        self.price = price
+        self.volume = volume
+        self.order_status = order_status
+
+        self.create_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
+        self.update_dt = self.create_dt
 
 if __name__ == '__main__':
     from coincast.database import DBManager
@@ -45,8 +65,8 @@ if __name__ == '__main__':
 
     from coincast.database import dao
 
-    queries = dao.query(SimulTraderOrder)
-    entries = [dict(order_no=q.order_no, run_no=q.run_no,type=q.type) for q in queries]
+    queries = dao.query(RealTraderOrder)
+    entries = [dict(order_no=q.order_id, run_no=q.run_no,type=q.type) for q in queries]
     dao.commit()
 
     print(entries[:10])

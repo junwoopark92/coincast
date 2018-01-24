@@ -59,9 +59,7 @@ def create_app(config_file_path='resource/config.cfg'):
     global exchange
     secretkey = coincast_app.config['SECRETKEY']
     accesstoken = coincast_app.config['ACCESSTOKEN']
-    print(secretkey, accesstoken)
     exchange = CoinoneExchange(username='test',secret_key=secretkey,access_token=accesstoken)
-    print(exchange.set_token(grant_type='init'))
 
     # THREAD INIT
     from coincast.thread import ThreadManager

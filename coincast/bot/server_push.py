@@ -25,8 +25,9 @@ def enrollment_trader(func, func_parm, interval=10):
     while True:
         try:
             func(func_parm)
-        except:
+        except Exception as e:
             Log.error('TRADER ERROR')
+            Log.info(e)
             dst_namespace = '/trader/log/' + str(func_parm)
             socketio.emit('message', 'ERROR', broadcast=True, namespace=dst_namespace)
 
@@ -81,6 +82,7 @@ def real_rsi_trader_alarm(run_no):
     run_info = dao.query(RealTraderRunHist).filter(RealTraderRunHist.run_no == run_no).first()
     trader = real_rsi_trader_v01(dao, run_info)
     return_buy, volume, rsi = trader.buy()
+    trader.sell()
 
     log_info = '[TRADER %s Called] RSI: %s' % (run_info.run_no, rsi)
     Log.info(log_info)

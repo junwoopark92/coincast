@@ -84,7 +84,7 @@ class RealTraderRunHist(Base):
 if __name__ == '__main__':
     from coincast.database import DBManager
 
-    db_url = 'mysql://DEV:coincast@49.142.50.199/CC_DEV?charset=utf8'
+    db_url = 'mysql://REAL:coincast@49.142.50.199/CC_REAL?charset=utf8'
     DBManager.init(db_url)
     DBManager.init_db()
 

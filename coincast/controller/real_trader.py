@@ -7,6 +7,7 @@ from coincast.database import dao
 from coincast.model.coinone_tick import CoinoneTick
 from coincast.model.trader import Trader
 from coincast.model.trader_run_hist import RealTraderRunHist
+from coincast.model.trader_order import RealTraderOrder
 from coincast import thread_manager
 from coincast.coincast_logger import Log
 from coincast.validation import is_positive_number
@@ -64,10 +65,32 @@ def create_real_trader():
 
     return redirect(url_for('.show_real_traders'))
 
+@coincast.route('/traders/real/order', methods=['post'])
+def show_real_trader_order_hist():
+    data = request.json
+    Log.info(data)
+
+    orders = dao.query(RealTraderOrder)\
+        .filter(RealTraderOrder.run_no == data['run_no'])\
+        .order_by(RealTraderOrder.create_dt.desc())\
+        .all()
+
+    orders = [order.__dict__ for order in orders]
+
+    order_list = []
+    for order in orders:
+        order.pop('_sa_instance_state')
+        order.pop('update_dt')
+        order['create_dt'] = order['create_dt'].strftime('%Y/%m/%d %H:%M:%S')
+        order_list.append(order)
+
+    return json.dumps({'status': 'OK', 'order_list': order_list})
+
+
 @coincast.route('/traders/real/run', methods=['post'])
 def run_real_trader():
     data = request.json
-    Log.info(data)
+    Log.info("%s trader start" % data)
     # start trader
     start_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
     Log.debug(start_dt)
@@ -85,10 +108,11 @@ def run_real_trader():
 
     return json.dumps({'status': 'OK', 'start_dt': start_dt})
 
+
 @coincast.route('/traders/real/stop', methods=['post'])
 def stop_real_trader():
     data = request.json
-    Log.info(data)
+    Log.info("%s trader stop" % data)
     end_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
 
     g = RUNNING_REAL_TRADER.pop(data['run_no'])

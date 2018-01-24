@@ -145,7 +145,7 @@ def get_seq():
 @coincast.route('/traders/run', methods=['post'])
 def run_trader():
     data = request.json
-    Log.info(data)
+    Log.info("%s simul trader start" % data)
     # start trader
     start_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
     Log.debug(start_dt)
@@ -167,7 +167,7 @@ def run_trader():
 @coincast.route('/traders/stop', methods=['post'])
 def stop_trader():
     data = request.json
-    Log.info(data)
+    Log.info("%s simul trader stop" % data)
     end_dt = strftime('%Y/%m/%d %H:%M:%S', localtime())
 
     g = RUNNING_TRADER.pop(data['run_no'])

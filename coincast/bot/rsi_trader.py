@@ -1,14 +1,15 @@
 from coincast.model.coinone_tick import CoinoneTick
-from coincast.model.trader_order import SimulTraderOrder
+from coincast.model.trader_order import SimulTraderOrder, RealTraderOrder
 from coincast.model.trader_run_hist import SimulTraderRunHist
 from coincast.model.trader_run_hist import RealTraderRunHist
 from coincast.model.trader import Trader
 from datetime import datetime, timedelta
+from coincast.database import dao
 from coincast import exchange
 from coincast.coincast_logger import Log
 from sqlalchemy.sql import func
 import pandas as pd
-from time import localtime
+from time import localtime, strftime
 
 
 class Singleton(type):
@@ -202,18 +203,58 @@ class real_rsi_trader_v01():
             return None, None, rsi
 
         if rsi < float(self.run_info.trader_parm['lower-bound-rsi']):
-            Log.info(exchange.buy_coin_order(coin_type='iota', price=buy_price, qty=volume))
+            response = exchange.buy_coin_order(coin_type=self.run_info.currency, price=buy_price, qty=volume)
+
+            if response['result'] != 'success':
+                Log.info(response)
+                return None, None, rsi
+
+            order = RealTraderOrder(order_id=response['orderId'],
+                                    run_no=self.run_info.run_no,
+                                    _type='buy',
+                                    price=buy_price,
+                                    volume=volume,
+                                    order_status='live')
+
+            self.bot_dao.add(order)
+
             balance = self.run_info.cur_balance - buy_price*volume
 
             self.bot_dao.query(RealTraderRunHist) \
                 .filter(RealTraderRunHist.run_no == self.run_info.run_no) \
                 .update({RealTraderRunHist.cur_balance: balance,
                          RealTraderRunHist.num_of_order: RealTraderRunHist.num_of_order + 1})
+
             self.bot_dao.commit()
 
             return buy_price, volume, rsi
 
         return None, None, rsi
+
+    def sell(self):
+        last_order = self.bot_dao.query(RealTraderOrder)\
+            .filter(RealTraderOrder.run_no == self.run_info.run_no)\
+            .order_by(RealTraderOrder.create_dt.desc())\
+            .first()
+
+        # none order
+        if last_order is None:
+            return None, -1
+
+        response = exchange.get_my_order_status(coin_type=self.run_info.currency, order_id=last_order.order_id)
+        if response['result'] != "success":
+            return None, -1
+
+        order_status = response['status']
+        if order_status != last_order.order_status:
+            self.bot_dao.query(RealTraderOrder) \
+                .filter(RealTraderOrder.order_id == last_order.order_id) \
+                .update({RealTraderOrder.order_status: order_status,
+                         RealTraderOrder.update_dt: strftime('%Y/%m/%d %H:%M:%S', localtime())})
+
+            self.bot_dao.commit()
+
+        return None, -1
 
 if __name__ == '__main__':
     pass
